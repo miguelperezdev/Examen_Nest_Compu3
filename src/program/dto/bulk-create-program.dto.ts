@@ -4,4 +4,6 @@
 //     (pista: @ValidateNested({ each: true }) + @Type(() => CreateProgramDto))
 export class BulkCreateProgramDto {
 
+    
+
 }
