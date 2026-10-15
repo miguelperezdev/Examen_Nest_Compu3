@@ -3,6 +3,7 @@
 //   - code: string de 3 a 6 letras MAYÚSCULAS (ej. "SIS", "MED")
 
 import {
+    IS_LOWERCASE,
   IsInt,
   IsOptional,
   IsPositive,
@@ -21,10 +22,10 @@ export class CreateProgramDto {
     @MinLength(3, { message: 'El nombre debe tener al menos 3 caracteres' })
     name: string;
 
-    @IsString({ message: 'La descripción debe ser una cadena de texto' })
+    @IsString({message: 'La descripción debe ser una cadena de texto' })
     @Min(3)
     @Max(6)
-    @IsUppercase()// Para letras? creo    <-----------------------
+    // Para letras? creo    <-----------------------
     code: string;
 
     @IsInt({ message: 'El número debe ser un entero' })

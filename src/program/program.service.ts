@@ -2,6 +2,12 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class ProgramService {
+  findAll(paginationDto: PaginationDto) {
+    throw new Error('Method not implemented.');
+  }
+  create(createProgramDto: any, user: User) {
+    throw new Error('Method not implemented.');
+  }
 
     // TODO Reto 1: inyecta el repositorio de Program (y lo que necesites para las transacciones)
 

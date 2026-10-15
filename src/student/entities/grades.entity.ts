@@ -18,14 +18,14 @@ export class Grades {
         description: "Subject name"
     })
     @Column("text")
-    subject:string;
+    subject:string | undefined;
 
     @ApiProperty({
         example: 5,
         description: "Grade obtained in the subject"
     })
     @Column("int")
-    grade: number;
+    grade: number | undefined;
 
     @ApiHideProperty()
     @ManyToOne(
