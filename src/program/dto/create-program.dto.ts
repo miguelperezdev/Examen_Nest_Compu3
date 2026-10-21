@@ -1,6 +1,7 @@
 // TODO Reto 1: reglas de validación con class-validator
 //   - name: string, mínimo 3 caracteres
 //   - code: string de 3 a 6 letras MAYÚSCULAS (ej. "SIS", "MED")
+//   - credits: entero positivo
 
 import {
     IS_LOWERCASE,
@@ -9,13 +10,12 @@ import {
   IsPositive,
   IsString,
   IsUppercase,
+  Matches,
   Max,
   MaxLength,
   Min,
   MinLength,
 } from 'class-validator';
-
-//   - credits: entero positivo
 export class CreateProgramDto {
 
     @IsString({ message: 'El nombre debe ser una cadena de texto' })
@@ -23,9 +23,7 @@ export class CreateProgramDto {
     name: string;
 
     @IsString({message: 'La descripción debe ser una cadena de texto' })
-    @Min(3)
-    @Max(6)
-    // Para letras? creo    <-----------------------
+    @Matches(/^[A-Z]{3,6}$/)
     code: string;
 
     @IsInt({ message: 'El número debe ser un entero' })
