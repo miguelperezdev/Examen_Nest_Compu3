@@ -3,8 +3,7 @@
 //   - cada elemento se debe validar con las mismas reglas de CreateProgramDto
 //     (pista: @ValidateNested({ each: true }) + @Type(() => CreateProgramDto))
 
-import { IsArray, IsNotEmpty, ValidateNested } from "class-validator";
-import { Program } from "../entities/program.entity";
+import { ArrayNotEmpty, IsArray, ValidateNested } from "class-validator";
 import { CreateProgramDto } from "./create-program.dto"; 
 import { Type } from "class-transformer";
 
@@ -12,10 +11,10 @@ import { Type } from "class-transformer";
 export class BulkCreateProgramDto {
 
     @IsArray()
-    @IsNotEmpty()
+    @ArrayNotEmpty()
     @ValidateNested({ each: true }) 
     @Type(() => CreateProgramDto) 
-    programs: CreateProgramDto[] | undefined
+    programs: CreateProgramDto[]
 
 
 
