@@ -1,0 +1,619 @@
+{
+  "info": {
+    "_postman_id": "2371f311-d96d-43ea-90aa-070a851c7dcd",
+    "name": "Reto — Faculty (Parte B)",
+    "description": "Peticiones para probar el módulo faculty. Ejecuta primero la carpeta Setup (Login llena {{token}}). Después crea una facultad: la variable {{facultyId}} se llena sola. En Asignar programas pega los id que saques de GET /program.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:9000/api",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "facultyId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "programId1",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "programId2",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "programId3",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Setup",
+      "item": [
+        {
+          "id": "9e7c1c28-1cf2-4d52-af73-72aedc3eb640",
+          "name": "Login (guarda el token)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user/auth",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "auth"
+              ]
+            },
+            "description": "Llena la variable {{token}} con tu usuario admin.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@icesi.edu.co\",\n  \"password\": \"Admin12345\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "id": "6c2098e9-360d-4173-b786-a4eab36ddd63",
+          "name": "Listar programas (para copiar ids)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/program?limit=10&skip=0",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "program"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "skip",
+                  "value": "0"
+                }
+              ]
+            },
+            "description": "De aquí sacas los id que le vas a asignar a la facultad."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Facultad",
+      "item": [
+        {
+          "id": "60be0faa-66a7-4279-8c4a-a647a3243804",
+          "name": "Guarda el facultyId automáticamente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let j = pm.response.json();",
+                  "if (j.id) { pm.collectionVariables.set('facultyId', j.id); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/faculty",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "faculty"
+              ]
+            },
+            "description": "Request trampa: solo existe para que el script de arriba corra."
+          },
+          "response": []
+        },
+        {
+          "id": "3e85c60a-9ff8-4ace-b4d8-14ab173c2b61",
+          "name": "Crear facultad",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/faculty",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "faculty"
+              ]
+            },
+            "description": "Solo admin. Al responder 201, el script de esta misma carpeta te guarda el id en {{facultyId}}.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Ingenieria\",\n  \"code\": \"ING\",\n  \"foundedYear\": 1960\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "id": "253eb617-d8c7-4d05-9e3b-bf374302d831",
+          "name": "Crear facultad repetida (409)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/faculty",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "faculty"
+              ]
+            },
+            "description": "Mismo name y code que la anterior -> debe dar 409 Conflict.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Ingenieria\",\n  \"code\": \"ING\",\n  \"foundedYear\": 1960\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "id": "30853e38-8ab3-4f56-869e-47d008ee6218",
+          "name": "Crear facultad inválida (400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/faculty",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "faculty"
+              ]
+            },
+            "description": "name corto, code en minúscula y año fuera de rango -> 400.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"AB\",\n  \"code\": \"ing\",\n  \"foundedYear\": 1800\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "id": "8cc6d40c-d185-4989-882c-4d1a69759a8f",
+          "name": "Listar facultades (paginado)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/faculty?limit=10&skip=0",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "faculty"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "skip",
+                  "value": "0"
+                }
+              ]
+            },
+            "description": "Público, no lleva token."
+          },
+          "response": []
+        },
+        {
+          "id": "35f8fe3b-c526-4de4-a330-5f40ec34d1a7",
+          "name": "Ver una facultad con sus programas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/faculty/{{facultyId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "faculty",
+                "{{facultyId}}"
+              ]
+            },
+            "description": "Público. Devuelve la facultad con su arreglo programs."
+          },
+          "response": []
+        },
+        {
+          "id": "31db023d-fa45-46b4-9e34-891ce549bb30",
+          "name": "Ver facultad id inválido (400)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/faculty/no-es-uuid",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "faculty",
+                "no-es-uuid"
+              ]
+            },
+            "description": "El ParseUUIDPipe responde 400 sin llegar al servicio."
+          },
+          "response": []
+        },
+        {
+          "id": "de0c6445-0820-44ce-bca7-f0082daa7543",
+          "name": "Ver facultad inexistente (404)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/faculty/11111111-2222-4333-8444-555555555555",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "faculty",
+                "11111111-2222-4333-8444-555555555555"
+              ]
+            },
+            "description": "UUID bien formado pero que no existe -> 404."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Asignar programas",
+      "item": [
+        {
+          "id": "ff1b0248-c6f7-4407-9c17-4ec029df0a66",
+          "name": "Asignar programas (acumulativo)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/faculty/{{facultyId}}/programs",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "faculty",
+                "{{facultyId}}",
+                "programs"
+              ]
+            },
+            "description": "Reemplaza programId1 y programId2 por ids reales de GET /program. Solo admin.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"programIds\": [\n    \"{{programId1}}\",\n    \"{{programId2}}\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "id": "02829082-5165-4ea5-9bfc-e7fdd91a0d3c",
+          "name": "Asignar otro más (sigue acumulando)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/faculty/{{facultyId}}/programs",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "faculty",
+                "{{facultyId}}",
+                "programs"
+              ]
+            },
+            "description": "Después de este, la facultad debe tener los 3: los anteriores se conservan.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"programIds\": [\n    \"{{programId3}}\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "id": "57b53e34-3b9f-4808-903c-ea607f11c989",
+          "name": "Asignar programId vacío (400)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/faculty/{{facultyId}}/programs",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "faculty",
+                "{{facultyId}}",
+                "programs"
+              ]
+            },
+            "description": "Arreglo vacío -> 400.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"programIds\": []\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "id": "49a27667-8437-4b83-a58e-f172b8135551",
+          "name": "Asignar id inexistente (404)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/faculty/{{facultyId}}/programs",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "faculty",
+                "{{facultyId}}",
+                "programs"
+              ]
+            },
+            "description": "Si algún id no existe -> 404 y NO se asigna ninguno (rollback).",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"programIds\": [\n    \"11111111-2222-4333-8444-555555555555\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "id": "d72a3e07-61da-45f3-988a-0fc5dd842069",
+          "name": "Sin token (401)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/faculty/{{facultyId}}/programs",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "faculty",
+                "{{facultyId}}",
+                "programs"
+              ]
+            },
+            "description": "Sin Authorization -> 401.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"programIds\": [\n    \"{{programId1}}\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "id": "b15b04ef-980b-4b6b-b58f-92c9a02a912b",
+          "name": "Con rol teacher (403)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/faculty/{{facultyId}}/programs",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "faculty",
+                "{{facultyId}}",
+                "programs"
+              ]
+            },
+            "description": "Cambia {{token}} por uno de un usuario teacher -> 403.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"programIds\": [\n    \"{{programId1}}\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

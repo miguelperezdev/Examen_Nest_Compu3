@@ -18,6 +18,7 @@ import {
 } from 'typeorm';
 import { Student } from '../../student/entities/student.entity';
 import { User } from '../../user/entities/user.entity';
+import { Faculty } from '../../faculty/entities/faculty.entity';
 
 @Entity('program')
 export class Program {
@@ -41,5 +42,10 @@ export class Program {
 
   @ManyToOne(() => User, { eager: true, nullable: true })
   createdBy?: User;
+
+  @ManyToOne(() => Faculty, (faculty) => faculty.programs, {
+    nullable: true,
+  })
+  faculty?: Faculty;
 
 }
