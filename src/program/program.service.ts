@@ -6,6 +6,7 @@ import { DataSource, In, Repository } from 'typeorm';
 import { Program } from './entities/program.entity';
 import { CreateProgramDto } from './dto/create-program.dto';
 import { AssignStudentsDto } from './dto/assign-students.dto';
+import { BulkCreateProgramDto } from './dto/bulk-create-program.dto';
 import { Student } from '../student/entities/student.entity';
 import { User } from '../user/entities/user.entity';
 
@@ -94,7 +95,7 @@ export class ProgramService {
         });
 
         if(!program)
-          throw new NotFoundException(`Program not found`);
+          throw new NotFoundException('Program not found');
 
         const students = await queryRunner.manager.find(Student, {
           where: { id: In(studentIds) },
@@ -103,9 +104,8 @@ export class ProgramService {
         if(students.length !== studentIds.length){
           const found = students.map( student => student.id );
           const missing = studentIds.filter( studentId => !found.includes(studentId) );
-          throw new NotFoundException(`Students with this ids not found`);
+          throw new NotFoundException('Students with this ids not found');
         }
-
         const actuales = program.students ?? [];
         const idsActuales = actuales.map( student => student.id );
         const nuevos = students.filter( student => !idsActuales.includes(student.id) );
@@ -127,4 +127,42 @@ export class ProgramService {
 
     // TODO Reto 3: bulkCreate(bulkCreateProgramDto, user) -> crea todos los programas o ninguno
     //   (transacción). Cualquier nombre/código repetido -> 409 y rollback.
+
+    async bulkCreate(bulkCreateProgramDto: BulkCreateProgramDto, user: User) {
+      const { programs } = bulkCreateProgramDto;
+
+      const queryRunner = this.datasource.createQueryRunner();
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
+      try{
+        const names = programs.map( p => p.name );
+        const codes = programs.map( p => p.code );
+
+          if(new Set(names).size !== names.length || new Set(codes).size !== codes.length){
+           throw new ConflictException('Hay un name o code repetido dentro del lote');
+        }
+
+        const existen = await queryRunner.manager.findOne(Program, {
+          where: [{ name: In(names) },
+            { code: In(codes) },
+          ],
+        });
+
+        if(existen){
+          throw new ConflictException('Ya existe un programa con ese name o code');
+          }
+        const nuevos = programs.map( p => queryRunner.manager.create(Program, {
+          ...p,
+          createdBy: user,
+        }));
+        const creados = await queryRunner.manager.save(Program, nuevos);
+        await queryRunner.commitTransaction();
+        return creados;
+      }catch(error){
+        await queryRunner.rollbackTransaction();
+        throw error;
+      }finally{
+        await queryRunner.release();
+      }
+    }
 }

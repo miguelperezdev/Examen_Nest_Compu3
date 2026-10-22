@@ -4,6 +4,7 @@ import { Auth } from '../user/decorators/auth.decorator';
 import { ValidRoles } from '../user/enums/valid-roles.enum';
 import { CreateProgramDto } from './dto/create-program.dto';
 import { AssignStudentsDto } from './dto/assign-students.dto';
+import { BulkCreateProgramDto } from './dto/bulk-create-program.dto';
 import { PaginationDto } from '../student/dto/pagination.dto';
 import { GetUser } from '../user/decorators/get-user.decorator';
 import { User } from '../user/entities/user.entity';
@@ -46,6 +47,13 @@ export class ProgramController {
   }
 
   // TODO Reto 3: POST   /api/program/bulk          -> crear programas en lote (todo o nada)
+
+  @Post("bulk")
+  @Auth(ValidRoles.admin)
+  bulkCreate(@Body() bulkCreateProgramDto: BulkCreateProgramDto, @GetUser() user: User){
+    return this.programService.bulkCreate(bulkCreateProgramDto, user);
+  }
+
   // TODO Reto 4: proteger los POST y el PATCH para que solo un admin pueda usarlos
 
 }
