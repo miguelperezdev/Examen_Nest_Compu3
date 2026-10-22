@@ -4,31 +4,24 @@
 //   - credits: entero positivo
 
 import {
-    IS_LOWERCASE,
   IsInt,
-  IsOptional,
   IsPositive,
   IsString,
-  IsUppercase,
   Matches,
-  Max,
-  MaxLength,
-  Min,
   MinLength,
 } from 'class-validator';
 export class CreateProgramDto {
 
     @IsString({ message: 'El nombre debe ser una cadena de texto' })
-    @MinLength(3, { message: 'El nombre debe tener al menos 3 caracteres' })
+    @MinLength(3)
     name: string;
 
-    @IsString({message: 'La descripción debe ser una cadena de texto' })
+    @IsString({ message: 'El código debe ser una cadena de texto' })
     @Matches(/^[A-Z]{3,6}$/)
     code: string;
 
-    @IsInt({ message: 'El número debe ser un entero' })
+    @IsInt({ message: 'Los créditos deben ser un número entero' })
     @IsPositive()
     credits: number;
-    
 
 }
